@@ -1,0 +1,87 @@
+#+TITLE: SpanTable
+
+Some classes to build a =JTable= which can merge cells visually.
+
+Given a =TableModel=:
+
+#+CAPTION: A TableModel without merged cells.
+[[file:readme-resources/unmerged-table.png]]
+
+And a List of =CellSpans=:
+#+BEGIN_SRC java
+List.of(new CellSpan(0, 0, 2, 2))
+#+END_SRC
+
+The cells 0A:1B will be merged into one Cell:
+
+#+CAPTION: A TableModel with merged cells.
+[[file:readme-resources/merged-table.png]]
+
+Merging cells means that the Grid is painted around the merged cell and the cell
+is painted once. The merged cell uses the =CellRenderer= and value from the upper
+left cell in the =CellSpan= for painting.
+
+In this example the value =foo= from 0A is used.
+
+* Usage
+To see basic usage of these classes take a look at =ExampleApp= in the test
+directory. 
+
+In our case we already had heavily customized classes inheriting from =JTable=.
+We chose to overwrite the corresponding methods in these customized classes
+instead of inheriting from =SpanTable=.
+
+When using a =JScrollPane= to hold the table, make sure to
+=setScrollMode(JViewport.SIMPLE_SCROLL_MODE)= on the =JScrollPanes= viewport. If
+this is not done blitting is used to accelerate the rendering when scrolling.
+The usage of blitting leads to visual artifacts. =SIMPLE_SCROLL_MODE= triggers a
+full repaint while scrolling.
+
+* Painting
+When painting a =CellSpan= only the upper left visible cell is painted. This has
+the effect, that the value is visible even while scrolling past the actual first
+cell of the span.
+
+* Selection
+When selecting a single cell in a =CellSpan= the selection is changed so that
+the upper left cell in the =CellSpan= is selected. Visually the whole =CellSpan=
+is selected.
+
+So selecting a =CellSpan= and using copy/paste will give you the value of the
+upper left cell.
+
+When selecting a =CellSpan= and some other cells the selection will look like
+this:
+
+#+CAPTION: A selection containing a CellSpan.
+[[file:readme-resources/partial-selection.png]]
+
+Using copy/paste the following values will be selected:
+
+| Schleswig-Holstein     | 	Dithmarschen        | 	Lehe     |
+| Schleswig-Holstein     | 	Herzogtum Lauenburg | 	Kittlitz |
+| Schleswig-Holstein	 | Pinneberg	           | Ellerbek     |
+| Schleswig-Holstein	 | Pinneberg	           | Halstenbek   |
+
+In this case the selected values for the =CellSpan= will reflect the values of
+the merged cells. In this case the four cells containing 'Schleswig-Holstein'
+were merged to one cell. Since all the merged cells have the same value the
+value appears four times in the pasted text. If you would merge cells with
+different values, these individual values would be copied.
+
+* Keyboard Navigation
+The keyboard navigation behavior was altered. When entering a =CellSpan= with the
+keyboard the focused cell is set to the upper left cell contained in the
+=CellSpan=.
+
+When using keyboard navigation in a =CellSpan=, we will skip the merged cells
+and directly jump to the next cell, which is not contained in the current =CellSpan=.
+
+* Known Issues
+- The Right-To-Left parts of the UI are not implemented.
+- Drag and drop for columns was not tested.
+- Scrolling by dragging the thumb of the =JScrollBar= can lead to visual
+  artifacts.
+
+* License
+GPL v2 with classpath exception, same as OpenJDK, see LICENSE in this repository.
