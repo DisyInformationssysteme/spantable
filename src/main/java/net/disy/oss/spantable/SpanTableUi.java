@@ -399,7 +399,7 @@ public class SpanTableUi extends BasicTableUI {
         for (int column = cMin; column <= cMax; column++) {
           cellRect = table.getCellRect(row, column, false);
           if (tableModel != null && tableModel.containsSpans(column)) {
-            paintSpanColumnCell(tableModel, g, cellRect, row, column, rMin, cMin);
+            paintSpanColumnCell(tableModel, g, cellRect, row, column);
           } else {
             paintCell(g, cellRect, row, column);
           }
@@ -508,7 +508,7 @@ public class SpanTableUi extends BasicTableUI {
     }
   }
 
-  private void paintSpanColumnCell(ISpanTableModel model, Graphics g, Rectangle realCellRect, int row, int column, int rowMin, int colMin) {
+  private void paintSpanColumnCell(ISpanTableModel model, Graphics g, Rectangle realCellRect, int row, int column) {
     Optional<CellSpan> span = model.getCellSpanContaining(row, column);
     if (span.isPresent()) {
       paintCellSpan(model, span.get(), g, realCellRect, row, column);

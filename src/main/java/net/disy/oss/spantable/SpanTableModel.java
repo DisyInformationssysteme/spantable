@@ -75,7 +75,30 @@ public class SpanTableModel  implements ISpanTableModel {
       if (i < 0) {
         continue;
       }
-      result.add(spans.get(i));
+      var foundSpan = spans.get(i);
+      result.add(foundSpan);
+      // check if there are intersecting spans before the found span
+      if (foundSpan.getStartRow() > cellSpan.getStartRow()) {
+        for (int j = i; j >= 0; j--) {
+          var precedingSpan = spans.get(j);
+          if (precedingSpan.intersects(cellSpan)) {
+            result.add(precedingSpan);
+          } else {
+            break;
+          }
+        }
+      }
+      // do the same for spans coming after the found span
+      if (foundSpan.getEndRow() < cellSpan.getEndRow()) {
+        for (int j = i; j < spans.size(); j++) {
+          var succeedingSpan = spans.get(j);
+          if (succeedingSpan.intersects(cellSpan)) {
+            result.add(succeedingSpan);
+          } else {
+            break;
+          }
+        }
+      }
     }
     return result;
   }
